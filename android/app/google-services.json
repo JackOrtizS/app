@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "488928365476",
+    "project_id": "ids-jack",
+    "storage_bucket": "ids-jack.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:488928365476:android:47196443e2b1e61442cf31",
+        "android_client_info": {
+          "package_name": "com.example.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAFgF1Ivv9Wl3qjOSXtef1ep91Wg3VKb1o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
