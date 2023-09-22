@@ -28,7 +28,7 @@ class _LoginPageState extends State<LoginPage> {
         QuickAlert.show(
           context: context,
           type: QuickAlertType.success,
-          text: 'Transaction Completed Successfully!',
+          text: 'Felicidades los datos son correctos!',
         );
       }
     }catch(e){
