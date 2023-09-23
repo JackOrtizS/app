@@ -1,8 +1,8 @@
+
+import 'package:app/Pages/Home.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:quickalert/quickalert.dart';
-
-
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -12,26 +12,22 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final _form = GlobalKey<FormState>();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final txtUserController = TextEditingController();
   final txtPasswordController = TextEditingController();
 
-  Future<void> _login() async{
-    try{
-      UserCredential userCredential = await _auth.signInWithEmailAndPassword(email: txtUserController.text, password: txtPasswordController.text);
-      if(userCredential.user == null){
-        print("Acceso no valido");
+  Future<void> _login() async {
+    try {
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+          email: txtUserController.text, password: txtPasswordController.text);
 
-
-      }else{
-        print('acceso correcto ${userCredential.user?.email}');
-        QuickAlert.show(
-          context: context,
-          type: QuickAlertType.success,
-          text: 'Felicidades los datos son correctos!',
+        Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context)  => HomePage())
         );
-      }
-    }catch(e){
+
+    } catch (e) {
       QuickAlert.show(
         context: context,
         type: QuickAlertType.error,
@@ -47,30 +43,56 @@ class _LoginPageState extends State<LoginPage> {
       appBar: AppBar(
         title: Text("Login"),
       ),
-      body:Column(
-        children: [Image.network("https://www.iconpacks.net/icons/1/free-user-login-icon-305-thumb.png") ,
-          TextField(
-            controller: txtUserController,
-          decoration:  InputDecoration(
-            border: OutlineInputBorder(), hintText: "Usuario"
-          ),
+      body: Form(
+        key: _form,
+        child: Column(
+          children: [
+            Image.network(
+              "https://www.iconpacks.net/icons/1/free-user-login-icon-305-thumb.png",
+              width: 100,
+            ),
+            Padding(
+              padding: EdgeInsets.all(20),
+              child: TextFormField(
+                controller: txtUserController,
+                decoration: InputDecoration(
+                    border: OutlineInputBorder(), hintText: "Usuario"),
+                validator: (value) {
+                  if (value == "") {
+                    return "Este campo es obligatorio";
+                  }
+                },
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(20),
+              child: TextFormField(
+                  controller: txtPasswordController,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                      border: OutlineInputBorder(), hintText: "Contraseña"),
+                  validator: (value) {
+                    if (value == "") {
+                      return "Este campo es obligatorio";
+                    }
+                  }),
+            ),
+            TextButton(
+              onPressed: () {
+                var IsValid = _form.currentState?.validate();
+
+                if (IsValid == null || IsValid == false) {
+                  return;
+                }
+                _login();
+              },
+              style: ButtonStyle(
+                foregroundColor: MaterialStateProperty.all<Color>(Colors.blue),
+              ),
+              child: const Text("Acceder"),
+            )
+          ],
         ),
-           TextField(
-            controller: txtPasswordController,
-          obscureText: true,
-          decoration: InputDecoration(
-            border: OutlineInputBorder(), hintText: "Contraseña"
-          ),
-        ),
-          TextButton(onPressed: (){
-            _login();
-          },
-          style: ButtonStyle(
-            foregroundColor: MaterialStateProperty.all<Color>(Colors.blue),
-          ),
-            child: const Text("Acceder"),
-          )
-        ],
       ),
     );
   }
