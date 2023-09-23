@@ -68,7 +68,7 @@ class _LoginPageState extends State<LoginPage> {
           style: ButtonStyle(
             foregroundColor: MaterialStateProperty.all<Color>(Colors.blue),
           ),
-            child: const Text("Accesar"),
+            child: const Text("Acceder"),
           )
         ],
       ),
