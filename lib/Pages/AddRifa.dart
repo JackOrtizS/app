@@ -52,6 +52,14 @@ class _AddRifaState extends State<AddRifa> {
             ),
 
             TextField(
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                  labelText: "Precio del boleto",
+                  hintText: "Ingrese el precio de boleto para la rifa"
+              ),
+            ),
+
+            TextField(
               controller: _dateI,
               decoration: const InputDecoration(
                 icon: Icon(Icons.calendar_month_rounded),
