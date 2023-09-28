@@ -1,5 +1,5 @@
+import 'package:app/Pages/AddRifa.dart';
 import 'package:flutter/material.dart';
-
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -18,31 +18,37 @@ class _HomePageState extends State<HomePage> {
           child: ListView(
             children: [
               DrawerHeader(
-                decoration: BoxDecoration(color: Colors.tealAccent),
+                  decoration: BoxDecoration(color: Colors.tealAccent),
                   child: Column(
-                children: [Text("Usuario"),Image.network(
-                  "https://w7.pngwing.com/pngs/276/546/png-transparent-computer-icons-user-others-miscellaneous-black-svg.png",
-                  width: 100,
-                )],
-
-              )
-              ),
+                    children: [
+                      Text("Usuario"),
+                      Image.network(
+                        "https://w7.pngwing.com/pngs/276/546/png-transparent-computer-icons-user-others-miscellaneous-black-svg.png",
+                        width: 100,
+                      )
+                    ],
+                  )),
               ListTile(
                 leading: Icon(Icons.monetization_on_outlined),
-                title:Text("Rifas"),
-                onTap: (){},
+                title: Text("Rifas"),
+                onTap: () {},
               ),
-
               ListTile(
                 leading: Icon(Icons.add_card_rounded),
-                title:Text("Boletos Apartados"),
-                onTap: (){},
+                title: Text("Boletos Apartados"),
+                onTap: () {},
               ),
             ],
           ),
         ),
         body: Center(
           child: Text("Home"),
-        ));
+        ),
+    floatingActionButton: FloatingActionButton(onPressed: (){
+      //Navigator.push(context, MaterialPageRoute(builder: (contex)=>AddRifa()),);
+      Navigator.push(context, MaterialPageRoute(builder: (context)=> AddRifa()),);
+
+    }, child: Icon(Icons.add),),
+    );
   }
 }
