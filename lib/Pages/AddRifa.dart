@@ -140,34 +140,67 @@ class _AddRifaState extends State<AddRifa> {
                   ))
                 ],
               ),
-              TextFormField(
-                onChanged: (val) {
-                  fechaTermino = DateTime.parse(val);
-                },
-                controller: _dateF,
-                validator: (value) {
-                  if (value == "") {
-                    return "Campo obligatorio";
-                  }
-                },
-                decoration: const InputDecoration(
-                  icon: Icon(Icons.calendar_month_rounded),
-                  labelText: "Fecha de Termino de la rifa Rifa",
-                ),
-                onTap: () async {
-                  DateTime? pickeddateT = await showDatePicker(
-                      context: context,
-                      initialDate: DateTime.now(),
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime(2100));
 
-                  if (pickeddateT != null) {
-                    fechaTermino = pickeddateT;
-                    _dateF.text = DateFormat.yMMMMd(Intl.getCurrentLocale())
-                        .format(pickeddateT);
-                  }
-                },
+
+              Row(
+                children: [
+                  Expanded(
+                      child: TextFormField(
+                        onChanged: (val) {
+                          fechaTermino = DateTime.parse(val);
+                        },
+                        controller: _dateF,
+                        validator: (value) {
+                          if (value == "") {
+                            return "Campo obligatorio";
+                          }
+                        },
+                        decoration: const InputDecoration(
+                          icon: Icon(Icons.calendar_month_rounded),
+                          labelText: "Fecha de Termino de la rifa Rifa",
+                        ),
+                        onTap: () async {
+                          DateTime? pickeddateT = await showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime(2000),
+                              lastDate: DateTime(2100));
+
+                          if (pickeddateT != null) {
+                            TimeOfDay? pickedTimeF = await showTimePicker(
+                                context: context,
+                                initialTime: TimeOfDay.now());
+
+
+                            if(pickedTimeF != null){
+                              DateTime selectedDateTimeT =  DateTime(
+                                pickeddateT.year,
+                                pickeddateT.month,
+                                pickeddateT.day,
+                                pickedTimeF.hour,
+                                pickedTimeF.minute,
+                              );
+
+                              setState(() {
+                                fechaTermino = selectedDateTimeT;
+                                _dateF.text = DateFormat.yMMMd(Intl.getCurrentLocale())
+                                .add_jm()
+                                .format(selectedDateTimeT);
+
+                              });
+                            }
+                            //fechaTermino = pickeddateT;
+                            //_dateF.text = DateFormat.yMMMMd(Intl.getCurrentLocale()).format(pickeddateT);
+                          }
+                        },
+                      ),
+                  )
+                ],
               ),
+
+
+
+
             ],
           ),
         ),
