@@ -12,8 +12,14 @@ class AddRifa extends StatefulWidget {
 }
 
 class _AddRifaState extends State<AddRifa> {
+  TextEditingController nombreController = TextEditingController();
+  TextEditingController descripcionController = TextEditingController();
+  TextEditingController numeroBoletosController = TextEditingController();
+  TextEditingController precioBoletoController = TextEditingController();
   TextEditingController _dateI = TextEditingController();
   TextEditingController _dateF = TextEditingController();
+  DateTime? fechaInicio;
+  DateTime? fechaTermino;
 
   @override
   Widget build(BuildContext context) {
@@ -65,27 +71,31 @@ class _AddRifaState extends State<AddRifa> {
                 icon: Icon(Icons.calendar_month_rounded),
                 labelText: "Fecha de inicio de la rifa Rifa",),
               onTap: () async {
-                DateTime? pickeddate = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2100));
-              },
-            ),
-            TextField(
-              controller: _dateI,
-              decoration: const InputDecoration(
-                icon: Icon(Icons.calendar_month_rounded),
-                labelText: "Fecha de Termino de la rifa Rifa",),
-              onTap: () async {
-                DateTime? pickeddate = await showDatePicker(
+                DateTime? pickeddateI = await showDatePicker(
                     context: context,
                     initialDate: DateTime.now(),
                     firstDate: DateTime(2000),
                     lastDate: DateTime(2100));
 
-                if(pickeddate != null){
-                  _dateI.text = DateFormat.yMMMMd(Intl.getCurrentLocale()).format(pickeddate);
+                if(pickeddateI != null){
+                  _dateI.text = DateFormat.yMMMMd(Intl.getCurrentLocale()).format(pickeddateI);
+                }
+              },
+            ),
+            TextField(
+              controller: _dateF,
+              decoration: const InputDecoration(
+                icon: Icon(Icons.calendar_month_rounded),
+                labelText: "Fecha de Termino de la rifa Rifa",),
+              onTap: () async {
+                DateTime? pickeddateT = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2100));
+
+                if(pickeddateT != null){
+                  _dateF.text = DateFormat.yMMMMd(Intl.getCurrentLocale()).format(pickeddateT);
                 }
               },
             ),
