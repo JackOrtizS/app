@@ -1,5 +1,6 @@
 import 'dart:ffi';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:quickalert/quickalert.dart';
@@ -33,6 +34,7 @@ class _AddRifaState extends State<AddRifa> {
           children: [
             //Nombre
             TextField(
+              controller: nombreController,
               decoration: InputDecoration(
                   labelText: "Nombre",
                   hintText: "Ingrese el nombre de la rifa"
@@ -41,6 +43,7 @@ class _AddRifaState extends State<AddRifa> {
 
             //Campo para la descripcion
             TextField(
+              controller: descripcionController,
               decoration: InputDecoration(
                   labelText: "Descripcion",
                   hintText: "Ingrese descripcion de la rifa"
@@ -50,6 +53,7 @@ class _AddRifaState extends State<AddRifa> {
             //Campo para el numero de boletos
 
             TextField(
+              controller: numeroBoletosController,
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
                   labelText: "Número de boletos",
@@ -58,6 +62,7 @@ class _AddRifaState extends State<AddRifa> {
             ),
 
             TextField(
+              controller: precioBoletoController,
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
                   labelText: "Precio del boleto",
@@ -65,24 +70,56 @@ class _AddRifaState extends State<AddRifa> {
               ),
             ),
 
-            TextField(
-              controller: _dateI,
-              decoration: const InputDecoration(
-                icon: Icon(Icons.calendar_month_rounded),
-                labelText: "Fecha de inicio de la rifa Rifa",),
-              onTap: () async {
-                DateTime? pickeddateI = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2100));
+            Row(
+              children: [
+                Expanded(child: TextField(
+                  onChanged: (val){
+                    fechaInicio = DateTime.parse(val);
+                  },
+                  controller: _dateI,
+                  decoration: const InputDecoration(
+                    icon: Icon(Icons.calendar_month_rounded),
+                    labelText: "Fecha de inicio de la rifa Rifa",),
+                  onTap: () async {
+                    DateTime? pickeddateI = await showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime(2000),
+                        lastDate: DateTime(2100));
 
-                if(pickeddateI != null){
-                  _dateI.text = DateFormat.yMMMMd(Intl.getCurrentLocale()).format(pickeddateI);
-                }
-              },
+                    if(pickeddateI != null){
+                      TimeOfDay? pickedTime = await showTimePicker(
+                        context: context,
+                        initialTime: TimeOfDay.now(),
+                      );
+                      if(pickedTime != null){
+                        DateTime selectedDteTime = DateTime(
+                          pickeddateI.year,
+                          pickeddateI.month,
+                          pickeddateI.day,
+                          pickedTime.hour,
+                            pickedTime.minute
+                        );
+                      //_dateI.text = DateFormat.yMMMMd(Intl.getCurrentLocale()).format(pickeddateI);
+                        setState(() {
+                          fechaInicio = selectedDteTime;
+
+                          _dateI.text = DateFormat.yMMMMd(Intl.getCurrentLocale())
+                              .add_jm()
+                              .format(selectedDteTime);
+                        });
+
+                      }
+                    }
+                  },
+                )
+                )
+              ],
             ),
             TextField(
+              onChanged: (val){
+                fechaTermino = DateTime.parse(val);
+              },
               controller: _dateF,
               decoration: const InputDecoration(
                 icon: Icon(Icons.calendar_month_rounded),
@@ -95,6 +132,7 @@ class _AddRifaState extends State<AddRifa> {
                     lastDate: DateTime(2100));
 
                 if(pickeddateT != null){
+                  fechaTermino = pickeddateT;
                   _dateF.text = DateFormat.yMMMMd(Intl.getCurrentLocale()).format(pickeddateT);
                 }
               },
@@ -104,13 +142,27 @@ class _AddRifaState extends State<AddRifa> {
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
-        onPressed: (){
+        onPressed: ()async{
 
-          QuickAlert.show(
+          /**QuickAlert.show(
             context: context,
             type: QuickAlertType.success,
             text: 'Felicidades Rifa Añadida',
-          );
+          );**/
+
+          
+          Map<String, dynamic>rifaData ={
+            "nombre":nombreController.text,
+            "descripcion": descripcionController.text,
+            "numeroBoletos": int.tryParse(numeroBoletosController.text) ?? 0,
+            "precioBoleto": int.tryParse(precioBoletoController.text) ?? 0,
+            "fechaInicio": fechaInicio,
+            "fechaFin":fechaTermino
+          };
+          CollectionReference rifas = FirebaseFirestore.instance.collection('rifas');
+          await rifas.add(rifaData);
+          print("Guardado");
+          Navigator.pop(context);
         },
       ),
     );
