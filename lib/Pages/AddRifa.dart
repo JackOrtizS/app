@@ -22,23 +22,28 @@ class _AddRifaState extends State<AddRifa> {
   TextEditingController descripcionController = TextEditingController();
   TextEditingController numeroBoletosController = TextEditingController();
   TextEditingController precioBoletoController = TextEditingController();
-  TextEditingController _dateI = TextEditingController();
-  TextEditingController _dateF = TextEditingController();
+  TextEditingController _dateI =
+      TextEditingController(text: DateTime.now().toString());
+  TextEditingController _dateF =
+      TextEditingController(text: DateTime.now().toString());
   DateTime? fechaInicio = DateTime.now();
   DateTime? fechaTermino = DateTime.now();
 
   _AddRifaState(this.idDoc) {
-    if(idDoc.isNotEmpty){
-      rifas.doc(this.idDoc).get().then((value){
+    if (idDoc.isNotEmpty) {
+      rifas.doc(this.idDoc).get().then((value) {
         nombreController.text = value['nombre'];
         descripcionController.text = value['descripcion'];
         numeroBoletosController.text = value['numeroBoletos'].toString();
         precioBoletoController.text = value['precioBoleto'].toString();
-        fechaInicio = value['fechaInicio'];
-        fechaTermino = value['fechaTermino'];
+        fechaInicio = value['fechaInicio'].toDate();
+        fechaTermino = value['fechaFin'].toDate();
 
-      }
-      );
+        _dateI.text = fechaInicio.toString();
+        _dateF.text = fechaTermino.toString();
+
+        setState(() {});
+      });
     }
   }
   final _form = GlobalKey<FormState>();
@@ -216,6 +221,7 @@ class _AddRifaState extends State<AddRifa> {
                   )
                 ],
               ),
+
             ],
           ),
         ),
@@ -254,7 +260,11 @@ class _AddRifaState extends State<AddRifa> {
               "fechaFin": fechaTermino
             };
 
-            await rifas.add(rifaData);
+            if (idDoc.isEmpty) {
+              await rifas.add(rifaData);
+            } else {
+              await rifas.doc(idDoc).update(rifaData);
+            }
             print("Guardado");
             Navigator.pop(context);
           }
