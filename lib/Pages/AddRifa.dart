@@ -6,21 +6,41 @@ import 'package:intl/intl.dart';
 import 'package:quickalert/quickalert.dart';
 
 class AddRifa extends StatefulWidget {
-  const AddRifa({super.key});
+  final String idDoc;
+
+  const AddRifa({super.key, required this.idDoc});
 
   @override
-  State<AddRifa> createState() => _AddRifaState();
+  State<AddRifa> createState() => _AddRifaState(this.idDoc);
 }
 
 class _AddRifaState extends State<AddRifa> {
+  final String idDoc;
+
+  CollectionReference rifas = FirebaseFirestore.instance.collection('rifas');
   TextEditingController nombreController = TextEditingController();
   TextEditingController descripcionController = TextEditingController();
   TextEditingController numeroBoletosController = TextEditingController();
   TextEditingController precioBoletoController = TextEditingController();
   TextEditingController _dateI = TextEditingController();
   TextEditingController _dateF = TextEditingController();
-  DateTime? fechaInicio;
-  DateTime? fechaTermino;
+  DateTime? fechaInicio = DateTime.now();
+  DateTime? fechaTermino = DateTime.now();
+
+  _AddRifaState(this.idDoc) {
+    if(idDoc.isNotEmpty){
+      rifas.doc(this.idDoc).get().then((value){
+        nombreController.text = value['nombre'];
+        descripcionController.text = value['descripcion'];
+        numeroBoletosController.text = value['numeroBoletos'].toString();
+        precioBoletoController.text = value['precioBoleto'].toString();
+        fechaInicio = value['fechaInicio'];
+        fechaTermino = value['fechaTermino'];
+
+      }
+      );
+    }
+  }
   final _form = GlobalKey<FormState>();
 
   @override
@@ -97,11 +117,11 @@ class _AddRifaState extends State<AddRifa> {
                       fechaInicio = DateTime.parse(val);
                     },
                     controller: _dateI,
-                        validator: (value) {
-                          if (value == "") {
-                            return "Campo obligatorio";
-                          }
-                        },
+                    validator: (value) {
+                      if (value == "") {
+                        return "Campo obligatorio";
+                      }
+                    },
                     decoration: const InputDecoration(
                       icon: Icon(Icons.calendar_month_rounded),
                       labelText: "Fecha de inicio de la rifa Rifa",
@@ -141,66 +161,61 @@ class _AddRifaState extends State<AddRifa> {
                 ],
               ),
 
-
               Row(
                 children: [
                   Expanded(
-                      child: TextFormField(
-                        onChanged: (val) {
-                          fechaTermino = DateTime.parse(val);
-                        },
-                        controller: _dateF,
-                        validator: (value) {
-                          if (value == "") {
-                            return "Campo obligatorio";
-                          }
-                        },
-                        decoration: const InputDecoration(
-                          icon: Icon(Icons.calendar_month_rounded),
-                          labelText: "Fecha de Termino de la rifa Rifa",
-                        ),
-                        onTap: () async {
-                          DateTime? pickeddateT = await showDatePicker(
-                              context: context,
-                              initialDate: DateTime.now(),
-                              firstDate: DateTime(2000),
-                              lastDate: DateTime(2100));
-
-                          if (pickeddateT != null) {
-                            TimeOfDay? pickedTimeF = await showTimePicker(
-                                context: context,
-                                initialTime: TimeOfDay.now());
-
-
-                            if(pickedTimeF != null){
-                              DateTime selectedDateTimeT =  DateTime(
-                                pickeddateT.year,
-                                pickeddateT.month,
-                                pickeddateT.day,
-                                pickedTimeF.hour,
-                                pickedTimeF.minute,
-                              );
-
-                              setState(() {
-                                fechaTermino = selectedDateTimeT;
-                                _dateF.text = DateFormat.yMMMd(Intl.getCurrentLocale())
-                                .add_jm()
-                                .format(selectedDateTimeT);
-
-                              });
-                            }
-                            //fechaTermino = pickeddateT;
-                            //_dateF.text = DateFormat.yMMMMd(Intl.getCurrentLocale()).format(pickeddateT);
-                          }
-                        },
+                    child: TextFormField(
+                      onChanged: (val) {
+                        fechaTermino = DateTime.parse(val);
+                      },
+                      controller: _dateF,
+                      validator: (value) {
+                        if (value == "") {
+                          return "Campo obligatorio";
+                        }
+                      },
+                      decoration: const InputDecoration(
+                        icon: Icon(Icons.calendar_month_rounded),
+                        labelText: "Fecha de Termino de la rifa Rifa",
                       ),
+                      onTap: () async {
+                        DateTime? pickeddateT = await showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime(2100));
+
+                        if (pickeddateT != null) {
+                          TimeOfDay? pickedTimeF = await showTimePicker(
+                              context: context, initialTime: TimeOfDay.now());
+
+                          if (pickedTimeF != null) {
+                            DateTime selectedDateTimeT = DateTime(
+                              pickeddateT.year,
+                              pickeddateT.month,
+                              pickeddateT.day,
+                              pickedTimeF.hour,
+                              pickedTimeF.minute,
+                            );
+
+                            setState(() {
+                              fechaTermino = selectedDateTimeT;
+                              _dateF.text =
+                                  DateFormat.yMMMd(Intl.getCurrentLocale())
+                                      .add_jm()
+                                      .format(selectedDateTimeT);
+
+                              //_dateF.text = DateFormat.yMMMd().add_jm().format(selectedDateTimeT);
+                            });
+                          }
+                          //fechaTermino = pickeddateT;
+                          //_dateF.text = DateFormat.yMMMMd(Intl.getCurrentLocale()).format(pickeddateT);
+                        }
+                      },
+                    ),
                   )
                 ],
               ),
-
-
-
-
             ],
           ),
         ),
@@ -227,9 +242,9 @@ class _AddRifaState extends State<AddRifa> {
           }
           else{**/
           var isValid = _form.currentState?.validate();
-          if(isValid == null || isValid == false){
+          if (isValid == null || isValid == false) {
             return;
-          }else{
+          } else {
             Map<String, dynamic> rifaData = {
               "nombre": nombreController.text,
               "descripcion": descripcionController.text,
@@ -238,8 +253,7 @@ class _AddRifaState extends State<AddRifa> {
               "fechaInicio": fechaInicio,
               "fechaFin": fechaTermino
             };
-            CollectionReference rifas =
-            FirebaseFirestore.instance.collection('rifas');
+
             await rifas.add(rifaData);
             print("Guardado");
             Navigator.pop(context);

@@ -1,4 +1,5 @@
 import 'package:app/Pages/AddRifa.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -41,12 +42,43 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         ),
-        body: Center(
-          child: Text("Home"),
+        body: StreamBuilder(
+          stream: FirebaseFirestore.instance.collection("rifas").snapshots(),
+          builder: (context, AsyncSnapshot<QuerySnapshot> snapshot){
+            if(!snapshot.hasData){
+              return CircularProgressIndicator();
+            }
+
+            List<DocumentSnapshot> docs = snapshot.data!.docs;
+            return ListView.builder(
+              itemCount: docs.length,
+                itemBuilder: (context, index){
+
+                final DocumentSnapshot rifa = docs[index];
+
+                return ListTile(
+                  leading: Icon(Icons.shop),
+                  title: Text(rifa['nombre']),
+                  subtitle: Row(
+                    children: [
+
+                  Text(rifa['descripcion']),
+                      Text(rifa['precioBoleto'].toString())
+                    ],
+                  ),
+                  onTap: (){
+                    print("hola" + rifa['nombre']);
+                    Navigator.push(context, MaterialPageRoute(builder: (context)=> AddRifa(idDoc: rifa.id,)),);
+
+                  },
+                );
+                }
+            );
+          },
         ),
     floatingActionButton: FloatingActionButton(onPressed: (){
       //Navigator.push(context, MaterialPageRoute(builder: (contex)=>AddRifa()),);
-      Navigator.push(context, MaterialPageRoute(builder: (context)=> AddRifa()),);
+      Navigator.push(context, MaterialPageRoute(builder: (context)=> AddRifa(idDoc: '',)),);
 
     }, child: Icon(Icons.add),),
     );
