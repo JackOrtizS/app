@@ -154,7 +154,7 @@ class _AddRifaState extends State<AddRifa> {
                             return AlertDialog(
                               title: Text("Confirmación"),
                               content: Text(
-                                  "¿Estas seguro que deseas eliminar esta Rifa?"),
+                                  "¿Estas seguro que deseas eliminar la rifa con nombre:  " + nombreController.text + "?"),
                               actions: <Widget>[
                                 TextButton(onPressed: () {
                                   Navigator.of(context).pop(false);
