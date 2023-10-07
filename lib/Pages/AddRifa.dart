@@ -1,6 +1,7 @@
 import 'dart:ffi';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:date_time_picker/date_time_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:quickalert/quickalert.dart';
@@ -22,12 +23,14 @@ class _AddRifaState extends State<AddRifa> {
   TextEditingController descripcionController = TextEditingController();
   TextEditingController numeroBoletosController = TextEditingController();
   TextEditingController precioBoletoController = TextEditingController();
-  TextEditingController _dateI =
+
+  TextEditingController txtFechaInicioController =
       TextEditingController(text: DateTime.now().toString());
-  TextEditingController _dateF =
+  TextEditingController txtFechaTerminoController =
       TextEditingController(text: DateTime.now().toString());
-  DateTime? fechaInicio = DateTime.now();
-  DateTime? fechaTermino = DateTime.now();
+
+  DateTime? _startDate = DateTime.now();
+  DateTime? _endDate = DateTime.now();
 
   _AddRifaState(this.idDoc) {
     if (idDoc.isNotEmpty) {
@@ -36,11 +39,12 @@ class _AddRifaState extends State<AddRifa> {
         descripcionController.text = value['descripcion'];
         numeroBoletosController.text = value['numeroBoletos'].toString();
         precioBoletoController.text = value['precioBoleto'].toString();
-        fechaInicio = value['fechaInicio'].toDate();
-        fechaTermino = value['fechaFin'].toDate();
 
-        _dateI.text = fechaInicio.toString();
-        _dateF.text = fechaTermino.toString();
+        _startDate = value['fechaInicio'].toDate();
+        _endDate = value['fechaFin'].toDate();
+
+        txtFechaInicioController.text = _startDate.toString();
+        txtFechaTerminoController.text = _endDate.toString();
 
         setState(() {});
       });
@@ -113,115 +117,66 @@ class _AddRifaState extends State<AddRifa> {
                     labelText: "Precio del boleto",
                     hintText: "Ingrese el precio de boleto para la rifa"),
               ),
-
-              Row(
-                children: [
-                  Expanded(
-                      child: TextFormField(
-                    onChanged: (val) {
-                      fechaInicio = DateTime.parse(val);
-                    },
-                    controller: _dateI,
-                    validator: (value) {
-                      if (value == "") {
-                        return "Campo obligatorio";
-                      }
-                    },
-                    decoration: const InputDecoration(
-                      icon: Icon(Icons.calendar_month_rounded),
-                      labelText: "Fecha de inicio de la rifa Rifa",
-                    ),
-                    onTap: () async {
-                      DateTime? pickeddateI = await showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime(2000),
-                          lastDate: DateTime(2100));
-
-                      if (pickeddateI != null) {
-                        TimeOfDay? pickedTime = await showTimePicker(
-                          context: context,
-                          initialTime: TimeOfDay.now(),
-                        );
-                        if (pickedTime != null) {
-                          DateTime selectedDteTime = DateTime(
-                              pickeddateI.year,
-                              pickeddateI.month,
-                              pickeddateI.day,
-                              pickedTime.hour,
-                              pickedTime.minute);
-                          //_dateI.text = DateFormat.yMMMMd(Intl.getCurrentLocale()).format(pickeddateI);
-                          setState(() {
-                            fechaInicio = selectedDteTime;
-
-                            _dateI.text =
-                                DateFormat.yMMMMd(Intl.getCurrentLocale())
-                                    .add_jm()
-                                    .format(selectedDteTime);
-                          });
-                        }
-                      }
-                    },
-                  ))
-                ],
+              DateTimePicker(
+                type: DateTimePickerType.date,
+                dateMask: 'd MMM yyyy ',
+                controller: txtFechaInicioController,
+                firstDate: DateTime(2000),
+                lastDate: DateTime(2101),
+                icon: Icon(Icons.date_range),
+                dateLabelText: "Fecha de inicio",
+                onChanged: (val) {
+                  _startDate = DateTime.parse(val);
+                },
               ),
 
-              Row(
-                children: [
-                  Expanded(
-                    child: TextFormField(
-                      onChanged: (val) {
-                        fechaTermino = DateTime.parse(val);
-                      },
-                      controller: _dateF,
-                      validator: (value) {
-                        if (value == "") {
-                          return "Campo obligatorio";
-                        }
-                      },
-                      decoration: const InputDecoration(
-                        icon: Icon(Icons.calendar_month_rounded),
-                        labelText: "Fecha de Termino de la rifa Rifa",
-                      ),
-                      onTap: () async {
-                        DateTime? pickeddateT = await showDatePicker(
-                            context: context,
-                            initialDate: DateTime.now(),
-                            firstDate: DateTime(2000),
-                            lastDate: DateTime(2100));
+              DateTimePicker(
+                type: DateTimePickerType.date,
+                dateMask: 'd MMM yyyy ',
+                controller: txtFechaTerminoController,
+                firstDate: DateTime(2001),
+                lastDate: DateTime(2101),
+                icon: Icon(Icons.date_range_sharp),
+                dateLabelText: "Fecha de Termino",
+                onChanged: (val) {
+                  _endDate = DateTime.parse(val);
+                },
+              ),
 
-                        if (pickeddateT != null) {
-                          TimeOfDay? pickedTimeF = await showTimePicker(
-                              context: context, initialTime: TimeOfDay.now());
 
-                          if (pickedTimeF != null) {
-                            DateTime selectedDateTimeT = DateTime(
-                              pickeddateT.year,
-                              pickeddateT.month,
-                              pickeddateT.day,
-                              pickedTimeF.hour,
-                              pickedTimeF.minute,
+
+              TextButton(
+                  onPressed: () async {
+                    if (idDoc.isNotEmpty) {
+                      bool confirm = await showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text("Confirmación"),
+                              content: Text(
+                                  "¿Estas seguro que deseas eliminar esta Rifa?"),
+                              actions: <Widget>[
+                                TextButton(onPressed: () {
+                                  Navigator.of(context).pop(false);
+                                },
+                                    child: Text("Cancelar")
+                                ),
+                                TextButton(onPressed: () {
+                                  Navigator.of(context).pop(true);
+                                },
+                                    child: Text("Eliminar")
+                                )
+                              ],
                             );
+                          });
 
-                            setState(() {
-                              fechaTermino = selectedDateTimeT;
-                              _dateF.text =
-                                  DateFormat.yMMMd(Intl.getCurrentLocale())
-                                      .add_jm()
-                                      .format(selectedDateTimeT);
-
-                              //_dateF.text = DateFormat.yMMMd().add_jm().format(selectedDateTimeT);
-                            });
-                          }
-                          //fechaTermino = pickeddateT;
-                          //_dateF.text = DateFormat.yMMMMd(Intl.getCurrentLocale()).format(pickeddateT);
-                        }
-                      },
-                    ),
-                  )
-                ],
-              ),
-
+                      if (confirm) {
+                        await rifas.doc(idDoc).delete();
+                        Navigator.pop(context);
+                      }
+                    }
+                  },
+                  child: Text("Eliminar"))
             ],
           ),
         ),
@@ -229,24 +184,6 @@ class _AddRifaState extends State<AddRifa> {
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: () async {
-          /**QuickAlert.show(
-            context: context,
-            type: QuickAlertType.success,
-            text: 'Felicidades Rifa Añadida',
-          );**/
-
-          /**if(nombreController.text.isEmpty ||
-          descripcionController.text.isEmpty ||
-          numeroBoletosController.text.isEmpty ||
-          precioBoletoController.text.isEmpty ||
-          fechaInicio == null ||
-          fechaTermino == null
-          ){
-           QuickAlert.show(context: context,
-               type: QuickAlertType.error,
-           text: 'Por favor ingrese informacion en todos los campos');
-          }
-          else{**/
           var isValid = _form.currentState?.validate();
           if (isValid == null || isValid == false) {
             return;
@@ -256,8 +193,8 @@ class _AddRifaState extends State<AddRifa> {
               "descripcion": descripcionController.text,
               "numeroBoletos": int.tryParse(numeroBoletosController.text) ?? 0,
               "precioBoleto": int.tryParse(precioBoletoController.text) ?? 0,
-              "fechaInicio": fechaInicio,
-              "fechaFin": fechaTermino
+              "fechaInicio": _startDate,
+              "fechaFin": _endDate
             };
 
             if (idDoc.isEmpty) {
@@ -265,11 +202,8 @@ class _AddRifaState extends State<AddRifa> {
             } else {
               await rifas.doc(idDoc).update(rifaData);
             }
-            print("Guardado");
             Navigator.pop(context);
           }
-
-          // }
         },
       ),
     );
