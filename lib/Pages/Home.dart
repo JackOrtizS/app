@@ -56,21 +56,18 @@ class _HomePageState extends State<HomePage> {
 
                 final DocumentSnapshot rifa = docs[index];
 
-                return ListTile(
-                  leading: Icon(Icons.shop),
-                  title: Text(rifa['nombre']),
-                  subtitle: Row(
-                    children: [
+                return Card(
+                 child: ListTile(
+                   leading: Icon(Icons.shop),
+                   title: Text(rifa['nombre'], style: TextStyle(fontSize: 18 ),),
+                   subtitle: Text(rifa['descripcion']),
 
-                  Text(rifa['descripcion']),
-                      Text(rifa['precioBoleto'].toString())
-                    ],
-                  ),
-                  onTap: (){
-                    print("hola" + rifa['nombre']);
-                    Navigator.push(context, MaterialPageRoute(builder: (context)=> AddRifa(idDoc: rifa.id,)),);
+                   onTap: (){
+                     print("hola" + rifa['nombre']);
+                     Navigator.push(context, MaterialPageRoute(builder: (context)=> AddRifa(idDoc: rifa.id,)),);
 
-                  },
+                   },
+                 ),
                 );
                 }
             );

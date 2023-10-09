@@ -73,6 +73,7 @@ class _AddRifaState extends State<AddRifa> {
                   }
                 },
                 decoration: InputDecoration(
+                  //border: OutlineInputBorder(),
                     labelText: "Nombre",
                     hintText: "Ingrese el nombre de la rifa"),
               ),
