@@ -148,41 +148,44 @@ class _AddRifaState extends State<AddRifa> {
                 },
               ),
 
+              Padding(
+                padding: EdgeInsets.all(20),
+                child: idDoc.isEmpty ? Container(): TextButton(
+                    onPressed: () async {
+                      if (idDoc.isNotEmpty) {
+                        bool confirm = await showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text("Confirmación"),
+                                content: Text(
+                                    "¿Estas seguro que deseas eliminar la rifa con nombre:  " + nombreController.text + "?"),
+                                actions: <Widget>[
+                                  TextButton(onPressed: () {
+                                    Navigator.of(context).pop(false);
+                                  },
+                                      child: Text("Cancelar")
+                                  ),
+                                  TextButton(onPressed: () {
+                                    Navigator.of(context).pop(true);
+                                  },
+                                      child: Text("Eliminar")
+                                  )
+                                ],
+                              );
+                            });
 
-
-              TextButton(
-                  onPressed: () async {
-                    if (idDoc.isNotEmpty) {
-                      bool confirm = await showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: Text("Confirmación"),
-                              content: Text(
-                                  "¿Estas seguro que deseas eliminar la rifa con nombre:  " + nombreController.text + "?"),
-                              actions: <Widget>[
-                                TextButton(onPressed: () {
-                                  Navigator.of(context).pop(false);
-                                },
-                                    child: Text("Cancelar")
-                                ),
-                                TextButton(onPressed: () {
-                                  Navigator.of(context).pop(true);
-                                },
-                                    child: Text("Eliminar")
-                                )
-                              ],
-                            );
-                          });
-
-                      if (confirm) {
-                        await rifas.doc(idDoc).delete();
-                        await boletos.doc(idDoc).delete();
-                        Navigator.pop(context);
+                        if (confirm) {
+                          await rifas.doc(idDoc).delete();
+                          await boletos.doc(idDoc).delete();
+                          Navigator.pop(context);
+                        }
                       }
-                    }
-                  },
-                  child: Text("Eliminar"))
+                    },
+                    child: Text("Eliminar")
+                ),
+              ),
+
             ],
           ),
         ),
