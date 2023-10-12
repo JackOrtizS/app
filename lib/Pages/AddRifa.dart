@@ -19,6 +19,8 @@ class _AddRifaState extends State<AddRifa> {
   final String idDoc;
 
   CollectionReference rifas = FirebaseFirestore.instance.collection('rifas');
+  CollectionReference boletos = FirebaseFirestore.instance.collection('boletos');
+  
   TextEditingController nombreController = TextEditingController();
   TextEditingController descripcionController = TextEditingController();
   TextEditingController numeroBoletosController = TextEditingController();
@@ -50,6 +52,8 @@ class _AddRifaState extends State<AddRifa> {
       });
     }
   }
+
+
   final _form = GlobalKey<FormState>();
 
   @override
@@ -173,6 +177,7 @@ class _AddRifaState extends State<AddRifa> {
 
                       if (confirm) {
                         await rifas.doc(idDoc).delete();
+                        await boletos.doc(idDoc).delete();
                         Navigator.pop(context);
                       }
                     }
@@ -198,8 +203,22 @@ class _AddRifaState extends State<AddRifa> {
               "fechaFin": _endDate
             };
 
+
+
             if (idDoc.isEmpty) {
-              await rifas.add(rifaData);
+              var nuevaRifa = await rifas.add(rifaData);
+
+              //String idRifa = idDoc;
+              int cantidadBoletos = int.parse(numeroBoletosController.text);
+
+              for(int i = 0; i < cantidadBoletos; i++){
+                boletos.add({
+                  "idRifa": nuevaRifa.id,
+                  "numeroBoleto": i +1,
+                  "reservado": false
+                });
+              }
+
             } else {
               await rifas.doc(idDoc).update(rifaData);
             }
@@ -210,3 +229,5 @@ class _AddRifaState extends State<AddRifa> {
     );
   }
 }
+
+

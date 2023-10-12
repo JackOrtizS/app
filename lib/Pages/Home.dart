@@ -1,4 +1,5 @@
 import 'package:app/Pages/AddRifa.dart';
+import 'package:app/Pages/Rifas.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 class HomePage extends StatefulWidget {
@@ -31,13 +32,19 @@ class _HomePageState extends State<HomePage> {
                   )),
               ListTile(
                 leading: Icon(Icons.monetization_on_outlined),
-                title: Text("Rifas"),
-                onTap: () {},
+                title: Text("Rifas Cliente"),
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) =>const
+                  RifaPage()),
+                  );
+                },
               ),
               ListTile(
                 leading: Icon(Icons.add_card_rounded),
                 title: Text("Boletos Apartados"),
-                onTap: () {},
+                onTap: () {
+
+                },
               ),
             ],
           ),
