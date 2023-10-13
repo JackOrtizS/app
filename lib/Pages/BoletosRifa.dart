@@ -1,3 +1,4 @@
+import 'package:app/Pages/BuyTicket.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 class BoletosRifa extends StatefulWidget {
@@ -21,6 +22,7 @@ class _BoletosRifaState extends State<BoletosRifa> {
         stream: FirebaseFirestore.instance
             .collection("boletos")
             .where('idRifa', isEqualTo: widget.idDoc)
+            .where('reservado',  isEqualTo: false )
             .snapshots(),
         builder: (context, snapshot){
           if(!snapshot.hasData){
@@ -42,8 +44,8 @@ class _BoletosRifaState extends State<BoletosRifa> {
                     subtitle: Text(boletos['reservado'].toString()),
 
                     onTap: (){
-//                      print("hola" + rifa['nombre']);
-                      //Navigator.push(context, MaterialPageRoute(builder: (context)=> AddRifa(idDoc: rifa.id,)),);
+                      print("hola" + boletos['numeroBoleto'].toString());
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=> BuyTicket(idDoc: boletos.id, ticketNumber: boletos['numeroBoleto'],)),);
 
                     },
                   ),
