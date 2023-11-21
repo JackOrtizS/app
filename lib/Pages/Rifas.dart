@@ -1,5 +1,6 @@
 import 'package:app/Pages/AddRifa.dart';
 import 'package:app/Pages/BoletosRifa.dart';
+import 'package:app/Pages/Login.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 class RifaPage extends StatefulWidget {
@@ -33,12 +34,11 @@ class _RifaPageState extends State<RifaPage> {
 
                 return Card(
                   child: ListTile(
-                    leading: Icon(Icons.shop),
+                    leading: Image.network(rifa['urlImagen'], width: 100, height: 100,),
                     title: Text(rifa['nombre'], style: TextStyle(fontSize: 18 ),),
                     subtitle: Text(rifa['descripcion']),
 
                     onTap: (){
-                      print("hola" + rifa['nombre']);
                       Navigator.push(context, MaterialPageRoute(builder: (context)=> BoletosRifa(idDoc: rifa.id,)),);
 
                     },
@@ -47,6 +47,12 @@ class _RifaPageState extends State<RifaPage> {
               }
           );
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: (){
+          Navigator.push(context, MaterialPageRoute(builder: (context)=> LoginPage()),);
+        },
+        child: Icon(Icons.admin_panel_settings_outlined),
       ),
     );
   }

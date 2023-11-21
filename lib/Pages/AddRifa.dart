@@ -1,10 +1,13 @@
 import 'dart:ffi';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:quickalert/quickalert.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class AddRifa extends StatefulWidget {
   final String idDoc;
@@ -34,6 +37,12 @@ class _AddRifaState extends State<AddRifa> {
   DateTime? _startDate = DateTime.now();
   DateTime? _endDate = DateTime.now();
 
+  final ImagePicker _picker =ImagePicker();
+  firebase_storage.Reference? _storageReference;
+  File? _image;
+
+
+
   _AddRifaState(this.idDoc) {
     if (idDoc.isNotEmpty) {
       rifas.doc(this.idDoc).get().then((value) {
@@ -55,6 +64,15 @@ class _AddRifaState extends State<AddRifa> {
 
 
   final _form = GlobalKey<FormState>();
+  
+  Future<void>_getImageForGallery() async{
+    XFile? image  = await _picker.pickImage(source: ImageSource.gallery);
+    if(image !=  null){
+      setState(() {
+        _image = File(image.path);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -148,6 +166,18 @@ class _AddRifaState extends State<AddRifa> {
                 },
               ),
 
+              _image == null 
+              ? Text("No se ha seleccionado ninguna imágen"):
+                  Image.file(_image!, height: 200.0,),
+              ElevatedButton(
+                  onPressed: ()async{
+                    await _getImageForGallery();
+                  },
+                  child: Text("Seleccionar Imagen")
+              ),
+
+              
+
               Padding(
                 padding: EdgeInsets.all(20),
                 child: idDoc.isEmpty ? Container(): TextButton(
@@ -193,8 +223,17 @@ class _AddRifaState extends State<AddRifa> {
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: () async {
+          _storageReference = firebase_storage.FirebaseStorage.instance
+          .ref()
+          .child('carpeta_destino/${DateTime.now()}.png');
+
+          await _storageReference?.putFile(_image!);
+
+          //Obtener la url de la imagen
+          String? downloadURL = await _storageReference?.getDownloadURL();
+
           var isValid = _form.currentState?.validate();
-          if (isValid == null || isValid == false) {
+          if (isValid == null || isValid == false ) {
             return;
           } else {
             Map<String, dynamic> rifaData = {
@@ -203,7 +242,8 @@ class _AddRifaState extends State<AddRifa> {
               "numeroBoletos": int.tryParse(numeroBoletosController.text) ?? 0,
               "precioBoleto": int.tryParse(precioBoletoController.text) ?? 0,
               "fechaInicio": _startDate,
-              "fechaFin": _endDate
+              "fechaFin": _endDate,
+              "urlImagen": downloadURL
             };
 
 

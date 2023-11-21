@@ -1,3 +1,4 @@
+import 'package:app/Pages/Rifas.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import './Pages/Login.dart';
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget {
 
         primarySwatch: Colors.blue,
       ),
-      home: const LoginPage(),
+      home: const RifaPage(),
     );
   }
 }
